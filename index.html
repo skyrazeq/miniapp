@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://w.soundcloud.com/player/api.js"></script>
+</head>
+<body>
+  <input id="q" placeholder="Поиск в SoundCloud" style="width:100%;padding:10px">
+  <button id="btn" style="width:100%;padding:10px">Найти</button>
+  <div id="list"></div>
+  <div id="player"></div>
+
+  <script>
+    Telegram.WebApp.ready(); // Mini App готов [page:0]
+
+    const API_BASE = "https://YOUR_BACKEND_DOMAIN"; // <-- поменяй
+
+    function mountPlayer(scUrl) {
+      const iframe = document.createElement("iframe");
+      iframe.width = "100%";
+      iframe.height = "166";
+      iframe.allow = "autoplay";
+      iframe.src = "https://w.soundcloud.com/player/?url=" + encodeURIComponent(scUrl) + "&auto_play=true";
+      const box = document.getElementById("player");
+      box.innerHTML = "";
+      box.appendChild(iframe);
+      SC.Widget(iframe).play(); // Widget API [page:1]
+    }
+
+    document.getElementById("btn").onclick = async () => {
+      const q = document.getElementById("q").value.trim();
+      const r = await fetch(`${API_BASE}/search?q=${encodeURIComponent(q)}&n=10`);
+      const data = await r.json();
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+      (data.items || []).forEach(t => {
+        const b = document.createElement("button");
+        b.textContent = t.title || t.url;
+        b.style = "width:100%;padding:10px;margin-top:6px";
+        b.onclick = () => mountPlayer(t.url);
+        list.appendChild(b);
+      });
+    };
+  </script>
+</body>
+</html>
