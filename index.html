@@ -31,7 +31,11 @@
 
     document.getElementById("btn").onclick = async () => {
       const q = document.getElementById("q").value.trim();
-      const r = await fetch(`${API_BASE}/search?q=${encodeURIComponent(q)}&n=10`);
+      const r = await fetch(`${API_BASE}/search?q=${encodeURIComponent(q)}&n=10`, {
+    headers: {
+        "X-Telegram-Init-Data": Telegram.WebApp.initData
+    }
+});
       const data = await r.json();
       const list = document.getElementById("list");
       list.innerHTML = "";
